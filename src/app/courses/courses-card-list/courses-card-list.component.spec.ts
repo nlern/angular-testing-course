@@ -4,6 +4,7 @@ import { CoursesModule } from "../courses.module";
 import { DebugElement } from "@angular/core";
 import { By } from "@angular/platform-browser";
 import { setupCourses } from "../common/setup-test-data";
+import { RouterTestingModule } from "@angular/router/testing";
 
 describe("CoursesCardListComponent", () => {
   let component: CoursesCardListComponent;
@@ -13,7 +14,7 @@ describe("CoursesCardListComponent", () => {
   beforeEach(
     waitForAsync(async () => {
       await TestBed.configureTestingModule({
-        imports: [CoursesModule],
+        imports: [CoursesModule, RouterTestingModule],
       }).compileComponents();
       fixture = TestBed.createComponent(CoursesCardListComponent);
       component = fixture.componentInstance;
@@ -32,8 +33,8 @@ describe("CoursesCardListComponent", () => {
 
     const cards = el.queryAll(By.css(".course-card"));
 
-    expect(cards).toBeTruthy("Could not find courses");
-    expect(cards.length).toBe(12, "Unexpected number of courses");
+    expect(cards).toBeTruthy();
+    expect(cards.length).toBe(12);
   });
 
   it("should display the first course", () => {
@@ -46,14 +47,8 @@ describe("CoursesCardListComponent", () => {
     const title = card.query(By.css("mat-card-title"));
     const img = card.query(By.css("img"));
 
-    expect(card).toBeTruthy("Could not find the course card");
-    expect(title.nativeElement.textContent).toBe(
-      course.titles.description,
-      "Wrong course title rendered"
-    );
-    expect(img.nativeElement.src).toBe(
-      course.iconUrl,
-      "Wrong course image source"
-    );
+    expect(card).toBeTruthy();
+    expect(title.nativeElement.textContent).toBe(course.titles.description);
+    expect(img.nativeElement.src).toBe(course.iconUrl);
   });
 });

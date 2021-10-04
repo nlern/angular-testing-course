@@ -23,8 +23,8 @@ describe("CoursesService", () => {
 
   it("should retreive all courses", () => {
     coursesService.findAllCourses().subscribe((courses) => {
-      expect(courses).toBeTruthy("No courses returned");
-      expect(courses.length).toBe(12, "incorect number of courses returned");
+      expect(courses).toBeTruthy();
+      expect(courses.length).toBe(12);
       const course = courses.find((course) => course.id === 12);
       expect(course.titles.description).toBe("Angular Testing Course");
     });
@@ -43,7 +43,7 @@ describe("CoursesService", () => {
 
   it("should find a course by id", () => {
     coursesService.findCourseById(12).subscribe((course) => {
-      expect(course).toBeTruthy("No course returned");
+      expect(course).toBeTruthy();
       expect(course.id).toBe(12);
     });
 
@@ -104,8 +104,8 @@ describe("CoursesService", () => {
 
   it("should find a list of lessons", () => {
     coursesService.findLessons(12).subscribe((lessons) => {
-      expect(lessons).toBeTruthy("No lessons were returned");
-      expect(lessons.length).toBe(3, "incorrect number of lessons returned");
+      expect(lessons).toBeTruthy();
+      expect(lessons.length).toBe(3);
     });
 
     const req = httpTestingController.expectOne(

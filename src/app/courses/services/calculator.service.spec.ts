@@ -4,10 +4,10 @@ import { LoggerService } from "./logger.service";
 
 describe("CalculatorService", () => {
   let calculator: CalculatorService;
-  let loggerSpy: any;
+  let loggerSpy: { log: jest.Mock };
 
   beforeEach(() => {
-    loggerSpy = jasmine.createSpyObj("LoggerService", ["log"]);
+    loggerSpy = { log: jest.fn() };
     TestBed.configureTestingModule({
       providers: [
         CalculatorService,

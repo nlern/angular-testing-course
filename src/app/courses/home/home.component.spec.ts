@@ -1,19 +1,21 @@
 import { waitForAsync, ComponentFixture, TestBed } from "@angular/core/testing";
-import { CoursesModule } from "../courses.module";
 import { DebugElement } from "@angular/core";
+import { RouterTestingModule } from "@angular/router/testing";
+import { NoopAnimationsModule } from "@angular/platform-browser/animations";
+import { By } from "@angular/platform-browser";
+import { of } from "rxjs";
+
+import { CoursesModule } from "../courses.module";
 
 import { HomeComponent } from "./home.component";
-import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { CoursesService } from "../services/courses.service";
 import { setupCourses } from "../common/setup-test-data";
-import { of } from "rxjs";
-import { By } from "@angular/platform-browser";
 
 describe("HomeComponent", () => {
   let fixture: ComponentFixture<HomeComponent>;
   let component: HomeComponent;
   let el: DebugElement;
-  let coursesService: any;
+  let coursesServiceSpy: { findAllCourses: jest.Mock };
 
   const begineerCourses = setupCourses().filter(
     (course) => course.category == "BEGINNER"
@@ -25,15 +27,13 @@ describe("HomeComponent", () => {
 
   beforeEach(
     waitForAsync(async () => {
-      coursesService = jasmine.createSpyObj("CoursesService", [
-        "findAllCourses",
-      ]);
-      await TestBed.configureTestingModule({
-        imports: [CoursesModule, NoopAnimationsModule],
+      coursesServiceSpy = { findAllCourses: jest.fn() };
+      TestBed.configureTestingModule({
+        imports: [CoursesModule, NoopAnimationsModule, RouterTestingModule],
         providers: [
           {
             provide: CoursesService,
-            useValue: coursesService,
+            useValue: coursesServiceSpy,
           },
         ],
       });
@@ -49,45 +49,49 @@ describe("HomeComponent", () => {
   });
 
   it("should display only beginner courses", () => {
-    coursesService.findAllCourses.and.returnValue(of(begineerCourses));
+    coursesServiceSpy.findAllCourses.mockImplementationOnce(() =>
+      of(begineerCourses)
+    );
 
     fixture.detectChanges();
 
     const tabs = el.queryAll(By.css(".mat-tab-label"));
-    expect(tabs.length).toBe(1, "only one tab shown");
+    expect(tabs.length).toBe(1);
 
     const tabLabel = (
       tabs[0].query(By.css(".mat-tab-label-content"))
         .nativeElement as HTMLElement
     ).textContent;
-    expect(tabLabel).toBe("Beginners", "tab label is beginner");
+    expect(tabLabel).toBe("Beginners");
   });
 
   it("should display only advanced courses", () => {
-    coursesService.findAllCourses.and.returnValue(of(advancedCourses));
+    coursesServiceSpy.findAllCourses.mockImplementationOnce(() =>
+      of(advancedCourses)
+    );
 
     fixture.detectChanges();
 
     const tabs = el.queryAll(By.css(".mat-tab-label"));
-    expect(tabs.length).toBe(1, "only one tab shown");
+    expect(tabs.length).toBe(1);
 
     const tabLabel = (
       tabs[0].query(By.css(".mat-tab-label-content"))
         .nativeElement as HTMLElement
     ).textContent;
-    expect(tabLabel).toBe("Advanced", "tab label is advanced");
+    expect(tabLabel).toBe("Advanced");
   });
 
   it("should display both tabs", () => {
-    coursesService.findAllCourses.and.returnValue(of(setupCourses()));
+    coursesServiceSpy.findAllCourses.mockImplementationOnce(() =>
+      of(setupCourses())
+    );
 
     fixture.detectChanges();
 
     const tabs = el.queryAll(By.css(".mat-tab-label"));
-    expect(tabs.length).toBe(2, "both tabs are shown");
+    expect(tabs.length).toBe(2);
   });
 
-  it("should display advanced courses when tab clicked", () => {
-    pending();
-  });
+  test.todo("should display advanced courses when tab clicked");
 });
