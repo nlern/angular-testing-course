@@ -13,20 +13,21 @@ describe("HomeComponent", () => {
   let fixture: ComponentFixture<HomeComponent>;
   let component: HomeComponent;
   let el: DebugElement;
-  let findAllCoursesSpy: jasmine.Spy;
+  let coursesService: any;
 
   const begineerCourses = setupCourses().filter(
     (course) => course.category == "BEGINNER"
   );
 
+  const advancedCourses = setupCourses().filter(
+    (course) => course.category == "ADVANCED"
+  );
+
   beforeEach(
     waitForAsync(async () => {
-      const coursesService = jasmine.createSpyObj("CoursesService", [
+      coursesService = jasmine.createSpyObj("CoursesService", [
         "findAllCourses",
       ]);
-      findAllCoursesSpy = coursesService.findAllCourses.and.returnValue(
-        of(begineerCourses)
-      );
       await TestBed.configureTestingModule({
         imports: [CoursesModule, NoopAnimationsModule],
         providers: [
@@ -47,19 +48,10 @@ describe("HomeComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  it("should not show courses before OnInit", () => {
-    const tabs = el.queryAll(By.css("mat-tab"));
-    expect(tabs.length).toBe(0, "nothing displayed");
-    expect(findAllCoursesSpy.calls.any()).toBe(
-      false,
-      "findAllCourses not yet called"
-    );
-  });
-
   it("should display only beginner courses", () => {
-    fixture.detectChanges();
+    coursesService.findAllCourses.and.returnValue(of(begineerCourses));
 
-    expect(findAllCoursesSpy.calls.any()).toBe(true, "findAllCourses called");
+    fixture.detectChanges();
 
     const tabs = el.queryAll(By.css(".mat-tab-label"));
     expect(tabs.length).toBe(1, "only one tab shown");
@@ -72,11 +64,27 @@ describe("HomeComponent", () => {
   });
 
   it("should display only advanced courses", () => {
-    pending();
+    coursesService.findAllCourses.and.returnValue(of(advancedCourses));
+
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mat-tab-label"));
+    expect(tabs.length).toBe(1, "only one tab shown");
+
+    const tabLabel = (
+      tabs[0].query(By.css(".mat-tab-label-content"))
+        .nativeElement as HTMLElement
+    ).textContent;
+    expect(tabLabel).toBe("Advanced", "tab label is advanced");
   });
 
   it("should display both tabs", () => {
-    pending();
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()));
+
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mat-tab-label"));
+    expect(tabs.length).toBe(2, "both tabs are shown");
   });
 
   it("should display advanced courses when tab clicked", () => {
