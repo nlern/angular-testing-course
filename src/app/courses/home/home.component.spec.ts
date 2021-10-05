@@ -1,4 +1,10 @@
-import { waitForAsync, ComponentFixture, TestBed } from "@angular/core/testing";
+import {
+  waitForAsync,
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flush,
+} from "@angular/core/testing";
 import { DebugElement } from "@angular/core";
 import { RouterTestingModule } from "@angular/router/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
@@ -10,6 +16,7 @@ import { CoursesModule } from "../courses.module";
 import { HomeComponent } from "./home.component";
 import { CoursesService } from "../services/courses.service";
 import { setupCourses } from "../common/setup-test-data";
+import { click } from "../common/test-utils";
 
 describe("HomeComponent", () => {
   let fixture: ComponentFixture<HomeComponent>;
@@ -49,7 +56,7 @@ describe("HomeComponent", () => {
   });
 
   it("should display only beginner courses", () => {
-    coursesServiceSpy.findAllCourses.mockImplementationOnce(() =>
+    coursesServiceSpy.findAllCourses.mockImplementation(() =>
       of(begineerCourses)
     );
 
@@ -66,7 +73,7 @@ describe("HomeComponent", () => {
   });
 
   it("should display only advanced courses", () => {
-    coursesServiceSpy.findAllCourses.mockImplementationOnce(() =>
+    coursesServiceSpy.findAllCourses.mockImplementation(() =>
       of(advancedCourses)
     );
 
@@ -83,7 +90,7 @@ describe("HomeComponent", () => {
   });
 
   it("should display both tabs", () => {
-    coursesServiceSpy.findAllCourses.mockImplementationOnce(() =>
+    coursesServiceSpy.findAllCourses.mockImplementation(() =>
       of(setupCourses())
     );
 
@@ -93,5 +100,25 @@ describe("HomeComponent", () => {
     expect(tabs.length).toBe(2);
   });
 
-  test.todo("should display advanced courses when tab clicked");
+  it("should display advanced courses when tab clicked", fakeAsync(() => {
+    coursesServiceSpy.findAllCourses.mockImplementation(() =>
+      of(setupCourses())
+    );
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mat-tab-label"));
+
+    click(tabs[1]);
+    fixture.detectChanges();
+
+    flush();
+
+    const cardTitles = el.queryAll(
+      By.css(".mat-tab-body-active .mat-card-title")
+    );
+    expect(cardTitles.length).toBeGreaterThan(0);
+    expect(cardTitles[0].nativeElement.textContent).toContain(
+      "Angular Security Course"
+    );
+  }));
 });
