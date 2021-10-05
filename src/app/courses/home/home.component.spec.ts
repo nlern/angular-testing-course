@@ -1,10 +1,4 @@
-import {
-  waitForAsync,
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  flush,
-} from "@angular/core/testing";
+import { waitForAsync, ComponentFixture, TestBed } from "@angular/core/testing";
 import { DebugElement } from "@angular/core";
 import { RouterTestingModule } from "@angular/router/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
@@ -100,25 +94,28 @@ describe("HomeComponent", () => {
     expect(tabs.length).toBe(2);
   });
 
-  it("should display advanced courses when tab clicked", fakeAsync(() => {
-    coursesServiceSpy.findAllCourses.mockImplementation(() =>
-      of(setupCourses())
-    );
-    fixture.detectChanges();
+  it(
+    "should display advanced courses when tab clicked",
+    waitForAsync(async () => {
+      coursesServiceSpy.findAllCourses.mockImplementation(() =>
+        of(setupCourses())
+      );
+      fixture.detectChanges();
 
-    const tabs = el.queryAll(By.css(".mat-tab-label"));
+      const tabs = el.queryAll(By.css(".mat-tab-label"));
 
-    click(tabs[1]);
-    fixture.detectChanges();
+      click(tabs[1]);
+      fixture.detectChanges();
 
-    flush();
+      await fixture.whenStable();
 
-    const cardTitles = el.queryAll(
-      By.css(".mat-tab-body-active .mat-card-title")
-    );
-    expect(cardTitles.length).toBeGreaterThan(0);
-    expect(cardTitles[0].nativeElement.textContent).toContain(
-      "Angular Security Course"
-    );
-  }));
+      const cardTitles = el.queryAll(
+        By.css(".mat-tab-body-active .mat-card-title")
+      );
+      expect(cardTitles.length).toBeGreaterThan(0);
+      expect(cardTitles[0].nativeElement.textContent).toContain(
+        "Angular Security Course"
+      );
+    })
+  );
 });
