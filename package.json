@@ -13,6 +13,7 @@
     "view:coverage": "http-server -c-1 -o coverage/",
     "coverage": "run-s prep:coverage view:coverage",
     "format:fix": "pretty-quick --staged",
+    "format:check": "prettier --config ./.prettierrc --list-different \"src/{app,environments,assets}/**/*{.ts,.js,.json,.css,.scss}\"",
     "prepare": "husky install",
     "lint": "ng lint",
     "cypress:open": "cypress open",
